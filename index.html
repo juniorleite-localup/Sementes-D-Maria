@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sementes D'Maria | Curso para Mulheres Empreendedoras</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Framer Motion -->
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Custom scrollbar aligned with new palette */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #E5D2CD; /* Sand */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #608683; /* Sage */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8F7C6B; /* Taupe */
+        }
+
+        .glass-nav {
+            background: rgba(229, 210, 205, 0.9); /* Sand with high opacity */
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(143, 124, 107, 0.1); /* Taupe border */
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, #608683, #8F7C6B); /* Sage to Taupe */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Paleta Exata Solicitada
+                        sage: '#608683',   // Verde Sálvia (CTAs, Destaques, Footer)
+                        sand: '#E5D2CD',   // Bege Areia (Background Principal)
+                        rose: '#C7A29E',   // Rosa Antigo (Cards, Secundários)
+                        taupe: '#8F7C6B',  // Marrom Taupe (Títulos, Ícones, Texto)
+                        ice: '#E7E8EC',    // Branco Gelo (Inputs, Molduras, Seções Leves)
+                        
+                        // Mapping for logical utility classes
+                        brand: {
+                            50: '#F2F4F4',
+                            100: '#E5D2CD', 
+                            200: '#C7A29E', 
+                            300: '#AABCB9',
+                            400: '#8F7C6B', 
+                            500: '#608683', 
+                            600: '#4D6B69',
+                            700: '#3A504E',
+                            800: '#263534',
+                            900: '#131A1A', 
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-sand text-taupe overflow-x-hidden selection:bg-rose selection:text-white">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        const { motion, AnimatePresence } = window.Motion;
+        const apiKey = ""; // A chave API será injetada pelo ambiente
+
+        // --- Icons ---
+        const Icons = {
+            Check: () => <i data-lucide="check" className="w-5 h-5 text-sage"></i>,
+            Star: () => <i data-lucide="star" className="w-4 h-4 text-yellow-600 fill-yellow-600"></i>,
+            Menu: () => <i data-lucide="menu" className="w-6 h-6 text-taupe"></i>,
+            X: () => <i data-lucide="x" className="w-6 h-6 text-taupe"></i>,
+            Users: () => <i data-lucide="users" className="w-6 h-6 text-white"></i>,
+            Award: () => <i data-lucide="award" className="w-6 h-6 text-white"></i>,
+            Video: () => <i data-lucide="video" className="w-6 h-6 text-white"></i>,
+            Shield: () => <i data-lucide="shield-check" className="w-6 h-6 text-white"></i>,
+            Instagram: () => <i data-lucide="instagram" className="w-5 h-5"></i>,
+            Linkedin: () => <i data-lucide="linkedin" className="w-5 h-5"></i>,
+            Youtube: () => <i data-lucide="youtube" className="w-5 h-5"></i>,
+            ChevronDown: () => <i data-lucide="chevron-down" className="w-5 h-5 text-sage"></i>,
+            ArrowRight: () => <i data-lucide="arrow-right" className="w-5 h-5 ml-2"></i>,
+            Sparkles: () => <i data-lucide="sparkles" className="w-5 h-5"></i>,
+            Bot: () => <i data-lucide="bot" className="w-8 h-8 text-white"></i>,
+            Send: () => <i data-lucide="send" className="w-4 h-4 ml-2"></i>,
+            Loader: () => <i data-lucide="loader-2" className="w-5 h-5 animate-spin ml-2"></i>,
+            Lightbulb: () => <i data-lucide="lightbulb" className="w-5 h-5 text-yellow-600"></i>,
+            Sprout: () => <i data-lucide="sprout" className="w-6 h-6 text-sage"></i>,
+            Seed: () => <i data-lucide="sprout" className="w-4 h-4 mr-2 text-sage"></i>,
+            Trophy: () => <i data-lucide="trophy" className="w-4 h-4 mr-2 text-yellow-600 fill-yellow-600"></i>,
+        };
+
+        // --- Components ---
+
+        const Navbar = () => {
+            const [isOpen, setIsOpen] = useState(false);
+
+            useEffect(() => {
+                lucide.createIcons();
+            }, [isOpen]);
+
+            const links = [
+                { name: "Curso", href: "#curso" },
+                { name: "Módulos", href: "#modulos" },
+                { name: "Mentores", href: "#mentores" },
+                { name: "Matrícula", href: "#matricula" },
+                { name: "FAQ", href: "#faq" },
+                { name: "D'Maria IA", href: "#mentoria-ia" },
+            ];
+
+            return (
+                <nav className="fixed w-full z-50 glass-nav transition-all duration-300">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex justify-between items-center h-20">
+                            {/* Logo */}
+                            <div className="flex-shrink-0 flex items-center cursor-pointer">
+                                <span className="text-2xl font-bold text-taupe tracking-tight hover:text-sage transition-colors">
+                                    Sementes D'Maria
+                                </span>
+                            </div>
+
+                            {/* Desktop Menu */}
+                            <div className="hidden md:flex items-center space-x-8">
+                                {links.map((link) => (
+                                    <a key={link.name} href={link.href} className="text-sm font-medium text-taupe hover:text-sage transition-colors">
+                                        {link.name}
+                                    </a>
+                                ))}
+                                <button className="bg-sage hover:bg-brand-600 text-white px-6 py-2.5 rounded-full text-sm font-semibold transition-all shadow-lg hover:shadow-rose/40 transform hover:-translate-y-0.5">
+                                    Quero me Inscrever
+                                </button>
+                            </div>
+
+                            {/* Mobile Button */}
+                            <div className="md:hidden flex items-center">
+                                <button onClick={() => setIsOpen(!isOpen)} className="p-2 rounded-md hover:bg-white/20 text-taupe">
+                                    {isOpen ? <Icons.X /> : <Icons.Menu />}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Mobile Menu */}
+                    <AnimatePresence>
+                        {isOpen && (
+                            <motion.div 
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="md:hidden bg-sand border-b border-taupe/10 overflow-hidden"
+                            >
+                                <div className="px-4 pt-2 pb-6 space-y-2">
+                                    {links.map((link) => (
+                                        <a key={link.name} href={link.href} onClick={() => setIsOpen(false)} className="block px-3 py-3 text-base font-medium text-taupe hover:text-sage hover:bg-white/30 rounded-lg">
+                                            {link.name}
+                                        </a>
+                                    ))}
+                                    <button className="w-full mt-4 bg-sage text-white px-6 py-3 rounded-lg text-base font-semibold shadow-md">
+                                        Quero me Inscrever Agora
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </nav>
+            );
+        };
+
+        const Hero = () => {
+            return (
+                <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-28 overflow-hidden bg-white">
+                    {/* Background Decor */}
+                    <div className="absolute top-0 right-0 -z-10 w-1/2 h-full bg-gradient-to-l from-white/40 to-transparent opacity-60"></div>
+                    
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+                            
+                            {/* Left Content */}
+                            <motion.div 
+                                initial={{ opacity: 0, x: -30 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.6 }}
+                            >
+                                <div className="inline-flex items-center px-3 py-1 rounded-full bg-rose/20 text-taupe text-xs font-bold uppercase tracking-wide mb-6 border border-rose/30">
+                                    <Icons.Trophy /> O curso definitivo para Mulheres Empreendedoras
+                                </div>
+                                
+                                <h1 className="text-4xl lg:text-6xl font-extrabold text-taupe leading-tight mb-6">
+                                    Transforme seu Sonho em um <span className="text-sage">Negócio Próspero</span> e Sustentável em 2026
+                                </h1>
+                                
+                                <p className="text-lg text-taupe/90 mb-8 leading-relaxed max-w-lg font-medium">
+                                    Programa definitivo de 12 meses para mulheres empreendedoras de Minas Gerais. Finanças, Marketing, Jurídico, Psicologia e Inteligência Artificial. Tudo em um só lugar, com quem entende do assunto!
+                                </p>
+                                
+                                <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                                    <button className="flex items-center justify-center bg-sage hover:bg-brand-600 text-white px-8 py-4 rounded-full font-bold text-lg transition-all shadow-xl hover:shadow-rose/30 hover:-translate-y-1 w-full sm:w-auto">
+                                        Quero Garantir Minha Vaga <Icons.ArrowRight />
+                                    </button>
+                                    <button className="flex items-center justify-center bg-transparent border-2 border-taupe/40 hover:border-taupe text-taupe hover:bg-white/20 px-8 py-4 rounded-full font-bold text-lg transition-all w-full sm:w-auto">
+                                        Saber mais
+                                    </button>
+                                </div>
+
+                                <div className="flex items-center gap-4">
+                                    <div className="flex -space-x-3">
+                                        {[1,2,3,4].map(i => (
+                                            <img key={i} src={`https://randomuser.me/api/portraits/women/${20+i}.jpg`} alt="Aluna" className="w-10 h-10 rounded-full border-2 border-sand" />
+                                        ))}
+                                    </div>
+                                    <div>
+                                        <div className="flex gap-1">
+                                            {[1,2,3,4,5].map(i => <Icons.Star key={i}/>)}
+                                        </div>
+                                        <p className="text-sm text-taupe font-medium">100% de satisfação das alunas</p>
+                                    </div>
+                                </div>
+                            </motion.div>
+
+                            {/* Right Image */}
+                            <motion.div 
+                                initial={{ opacity: 0, x: 30 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.8, delay: 0.2 }}
+                                className="relative flex justify-center lg:justify-end"
+                            >
+                                {/* Adicionei w-72 h-72 (mobile) e lg:w-96 lg:h-96 (desktop) para garantir o tamanho */}
+                                <div className="relative rounded-full p-3 border-2 border-rose/30 w-72 h-72 lg:w-96 lg:h-96 shrink-0">
+                                    <div className="relative rounded-full overflow-hidden shadow-2xl w-full h-full border-8 border-white">
+                                        <img 
+                                            src="josy-hero.jpg" 
+                                            alt="Josy Lopes, fundadora do Sementes D'Maria" 
+                                            className="object-cover w-full h-full transform hover:scale-105 transition-duration-700"
+                                        />
+                                    </div>
+                                </div>
+                                
+                                {/* Floating Badge */}
+                                <div className="absolute bottom-4 right-4 lg:bottom-10 lg:right-10 bg-white/90 backdrop-blur p-4 rounded-xl shadow-lg border border-taupe/10 max-w-xs z-10">
+                                    <div className="flex items-center justify-between gap-4">
+                                        <div>
+                                            <p className="text-xs text-taupe/70 font-semibold uppercase">Próxima Turma</p>
+                                            <p className="text-sage font-bold">Janeiro de 2026</p>
+                                        </div>
+                                        <div className="bg-sage text-white px-3 py-1 rounded-full text-xs font-bold">
+                                            Vagas Abertas
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {/* Decor Dots */}
+                                <div className="absolute top-10 left-0 lg:-left-4 w-24 h-24 bg-rose opacity-30 rounded-full blur-2xl -z-10"></div>
+                            </motion.div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Logos = () => {
+            const items = [
+                "Certificado Reconhecido",
+                "Suporte Vitalício",
+                "Acesso Imediato",
+                "Networking Premium"
+            ];
+            return (
+                <section className="py-10 border-y border-taupe/10 bg-ice/50">
+                    <div className="max-w-7xl mx-auto px-4">
+                        <div className="flex flex-wrap justify-center md:justify-between gap-8 items-center opacity-80 hover:opacity-100 transition-all duration-500">
+                            {items.map((item, idx) => (
+                                <div key={idx} className="flex items-center gap-2 font-semibold text-taupe text-lg">
+                                    <div className="bg-rose/20 p-1.5 rounded-full text-taupe">
+                                        <Icons.Check />
+                                    </div>
+                                    {item}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const CourseStory = () => {
+            return (
+                <section id="curso" className="py-20 bg-white relative overflow-hidden scroll-mt-20">
+                    {/* Decorative background element */}
+                    <div className="absolute top-0 left-0 w-32 h-32 bg-sand rounded-full blur-3xl opacity-60 -translate-x-1/2 -translate-y-1/2"></div>
+                    
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        {/* Parte 1: Missão e História */}
+                        <div className="max-w-4xl mx-auto mb-20">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.6 }}
+                                className="text-center mb-16"
+                            >
+                                <div className="inline-flex items-center justify-center p-3 mb-8 rounded-full bg-sand">
+                                    <div className="bg-rose/20 p-2 rounded-full text-taupe mr-3">
+                                        <Icons.Sprout />
+                                    </div>
+                                    <span className="text-taupe font-bold text-sm uppercase tracking-wide">Nossa Missão</span>
+                                </div>
+
+                                <h2 className="text-3xl md:text-4xl font-bold text-taupe mb-8 leading-tight">
+                                    Você não precisa <span className="text-sage">empreender sozinha.</span>
+                                </h2>
+                                
+                                <div className="space-y-6 text-lg text-taupe/90 leading-relaxed text-justify md:text-center">
+                                    <p>
+                                        Empreender é desafiador. <strong className="text-sage">Josy Lopes</strong>, fundadora do projeto, sentiu na pele os desafios de abrir e gerir um negócio em Montes Claros. Cada obstáculo que ela enfrentou não foi um ponto final, mas uma <span className="text-sage font-semibold">semente de aprendizado</span>.
+                                    </p>
+                                    <p>
+                                        Muitas mulheres desistem por falta de apoio técnico ou emocional. A <strong>Sementes D'Maria</strong> nasceu para mudar essa realidade. Nosso objetivo é encurtar caminhos e oferecer suporte prático, criando uma rede de apoio que fortalece, inspira e impulsiona você a alcançar seu potencial máximo.
+                                    </p>
+                                </div>
+                            </motion.div>
+
+                            {/* Parte 2: Ecossistema Block - Using Rose as accent background */}
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.6, delay: 0.2 }}
+                                className="bg-rose/10 rounded-3xl p-8 md:p-12 border border-rose/30"
+                            >
+                                <div className="text-center mb-10">
+                                    <h3 className="text-2xl md:text-3xl font-bold text-taupe mb-4">
+                                        Mais do que um curso, um <span className="text-sage">ecossistema de crescimento.</span>
+                                    </h3>
+                                    <p className="text-lg text-taupe/80 leading-relaxed">
+                                        Projetado exclusivamente para o público feminino, este é um acompanhamento de 1 ano para qualificar você profissionalmente e te dar autonomia financeira.
+                                    </p>
+                                </div>
+
+                                <div className="grid md:grid-cols-3 gap-8">
+                                    <div className="text-center">
+                                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mx-auto mb-4 shadow-sm text-sage">
+                                            <i data-lucide="video" className="w-6 h-6"></i>
+                                        </div>
+                                        <h4 className="font-bold text-taupe mb-2">Formato Híbrido Inteligente</h4>
+                                        <p className="text-sm text-taupe/70">Aulas transmitidas online para você assistir de onde estiver.</p>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mx-auto mb-4 shadow-sm text-sage">
+                                            <i data-lucide="store" className="w-6 h-6"></i>
+                                        </div>
+                                        <h4 className="font-bold text-taupe mb-2">Networking Real</h4>
+                                        <p className="text-sm text-taupe/70">Feira Online e Feira Presencial para você expor e vender seus produtos.</p>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center mx-auto mb-4 shadow-sm text-sage">
+                                            <i data-lucide="shield-check" className="w-6 h-6"></i>
+                                        </div>
+                                        <h4 className="font-bold text-taupe mb-2">Acompanhamento</h4>
+                                        <p className="text-sm text-taupe/70">Mentoria especializada para garantir que você não trave no meio do caminho.</p>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        </div>
+
+                        {/* Parte 3: O Grid de Diferenciais */}
+                        <div className="pt-10 border-t border-taupe/10">
+                             <div className="text-center mb-12">
+                                <h3 className="text-2xl font-bold text-taupe">Tudo o que seu negócio precisa</h3>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-3 grid-rows-2 gap-6">
+                                {/* Main Card */}
+                                <motion.div 
+                                    whileHover={{ y: -5 }}
+                                    className="md:col-span-2 md:row-span-2 bg-ice rounded-3xl p-8 shadow-xl border border-white flex flex-col relative overflow-hidden group"
+                                >
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-sand rounded-full -mr-16 -mt-16 opacity-50 group-hover:scale-110 transition-transform"></div>
+                                    <div className="z-10">
+                                        <div className="w-12 h-12 bg-sage rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-sage/30">
+                                            <Icons.Award />
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-taupe mb-4">Curso Completo 360º</h3>
+                                        <p className="text-taupe/80 mb-8 leading-relaxed">
+                                            Um ecossistema de aprendizado que cobre todas as áreas vitais. 
+                                            Conhecimento profundo em pilares essenciais para o sucesso e longevidade do seu negócio.
+                                        </p>
+                                        <ul className="space-y-3 mb-8">
+                                            {["Finanças & Gestão", "Marketing Digital & Vendas", "Aspectos Jurídicos", "Inteligência Artificial"].map(item => (
+                                                <li key={item} className="flex items-center text-taupe">
+                                                    <div className="mr-3 p-1 bg-sage/20 rounded-full"><Icons.Check /></div>
+                                                    {item}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        <div className="mt-auto rounded-xl overflow-hidden h-64 w-full">
+                                             <img 
+                                                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80" 
+                                                alt="Curso Completo" 
+                                                className="w-full h-full object-cover transform group-hover:scale-105 transition-all duration-700 grayscale hover:grayscale-0"
+                                            />
+                                        </div>
+                                    </div>
+                                </motion.div>
+
+                                {/* Secondary Cards */}
+                                <motion.div whileHover={{ y: -5 }} className="bg-ice rounded-3xl p-6 shadow-lg border border-white flex flex-col">
+                                    <div className="w-10 h-10 bg-rose rounded-lg flex items-center justify-center mb-4 text-white">
+                                        <Icons.Users />
+                                    </div>
+                                    <h4 className="text-xl font-bold text-taupe mb-2">Grupo Exclusivo</h4>
+                                    <p className="text-taupe/70 text-sm">Networking e suporte direto com outros empreendedores de elite.</p>
+                                </motion.div>
+
+                                <motion.div whileHover={{ y: -5 }} className="bg-ice rounded-3xl p-6 shadow-lg border border-white flex flex-col">
+                                    <div className="w-10 h-10 bg-sage rounded-lg flex items-center justify-center mb-4 text-white">
+                                        <Icons.Shield />
+                                    </div>
+                                    <h4 className="text-xl font-bold text-taupe mb-2">Certificado Digital</h4>
+                                    <p className="text-taupe/70 text-sm">Reconhecido pelo mercado e válido em todo território nacional.</p>
+                                </motion.div>
+
+                                <motion.div whileHover={{ y: -5 }} className="bg-sage rounded-3xl p-6 shadow-lg shadow-sage/30 flex flex-col text-white md:col-span-1">
+                                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mb-4">
+                                        <Icons.Video />
+                                    </div>
+                                    <h4 className="text-xl font-bold mb-2">Aulas Ao Vivo</h4>
+                                    <p className="text-white/80 text-sm mb-4">Tire dúvidas diretamente com o mentor semanalmente.</p>
+                                    <div className="mt-auto pt-4 border-t border-white/20">
+                                        <span className="text-xs font-semibold uppercase tracking-wider">Time de peso</span>
+                                    </div>
+                                </motion.div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Features = () => {
+            // New Modules Content
+            const modules = [
+                {
+                    title: "Gestão e Estratégia",
+                    icon: "📊",
+                    borderClass: "border-rose/20 hover:border-rose/50",
+                    bgIcon: "bg-rose/10 text-taupe", // Taupe icon for better contrast on rose light
+                    items: [
+                        { name: "Educação Financeira e Investimentos", desc: "Perca o medo dos números e aprenda a investir." },
+                        { name: "Contabilidade Simplificada", desc: "Apoio para MEI, regularização e gestão tributária." },
+                        { name: "Marketing e Planejamento Estratégico", desc: "Como posicionar sua marca no mercado." },
+                        { name: "Inovação e IA para Negócios", desc: "Utilize a tecnologia a seu favor para ganhar tempo e escala." }
+                    ]
+                },
+                {
+                    title: "Desenvolvimento Pessoal e Imagem",
+                    icon: "🧠",
+                    borderClass: "border-sage/20 hover:border-sage/50",
+                    bgIcon: "bg-sage/10 text-sage",
+                    items: [
+                        { name: "Psicologia para Empreendedoras", desc: "Fortalecimento emocional e autoconhecimento." },
+                        { name: "Consultoria de Imagem", desc: "Alinhe sua imagem pessoal à mensagem que sua marca quer passar." },
+                        { name: "Oratória e Comunicação", desc: "Aprenda a vender suas ideias com confiança." }
+                    ]
+                },
+                {
+                    title: "Segurança e Suporte",
+                    icon: "⚖️",
+                    borderClass: "border-taupe/20 hover:border-taupe/50",
+                    bgIcon: "bg-taupe/10 text-taupe",
+                    items: [
+                        { name: "Advocacia", desc: "Entenda seus direitos e proteja seu negócio juridicamente." }
+                    ]
+                }
+            ];
+
+            return (
+                <section id="modulos" className="py-20 bg-sand scroll-mt-20">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-16">
+                            <h2 className="text-sage font-bold tracking-wide uppercase text-sm mb-2">O Que Você Vai Aprender</h2>
+                            <h3 className="text-3xl md:text-4xl font-bold text-taupe mb-4">Conteúdo que cobre todas as bases</h3>
+                            <p className="text-lg text-taupe/80 max-w-2xl mx-auto">
+                                Dividimos o conhecimento em pilares essenciais (Hard Skills e Soft Skills) para o sucesso sustentável do seu negócio.
+                            </p>
+                        </div>
+
+                        <div className="grid md:grid-cols-3 gap-8">
+                            {modules.map((mod, idx) => (
+                                <motion.div 
+                                    key={idx}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: idx * 0.1 }}
+                                    viewport={{ once: true }}
+                                    className={`bg-white rounded-3xl p-8 border ${mod.borderClass} shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col h-full`}
+                                >
+                                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-8 ${mod.bgIcon}`}>
+                                        {mod.icon}
+                                    </div>
+                                    <h4 className="text-xl font-bold text-taupe mb-6 border-b border-taupe/10 pb-4">{mod.title}</h4>
+                                    
+                                    <ul className="space-y-6 flex-1">
+                                        {mod.items.map((item, i) => (
+                                            <li key={i} className="relative pl-4">
+                                                <div className="absolute left-0 top-2 w-1.5 h-1.5 rounded-full bg-rose"></div>
+                                                <h5 className="font-bold text-taupe text-sm mb-1">{item.name}</h5>
+                                                <p className="text-sm text-taupe/60 leading-relaxed">{item.desc}</p>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Mentors = () => {
+            const mentors = [
+                // Updated image filename with encoded space
+                { name: "Renata Alves Costa", role: "Finanças", img: "Renata%20Alves.jpg", bio: "Especialista em investimentos e educadora financeira, ensina que investir é ferramenta de transformação de vida." },
+                { name: "Erika Rocha", role: "Imagem", img: "https://randomuser.me/api/portraits/women/65.jpg", bio: "Consultora e estrategista com especialização em neurociência aplicada à imagem." },
+                { name: "Fred Marques", role: "Oratória", img: "https://randomuser.me/api/portraits/men/32.jpg", bio: "Head de Speaker Coaching do TEDx Belo Horizonte e professor da Fundação Dom Cabral." },
+                { name: "Junio Enes", role: "Inovação", img: "https://randomuser.me/api/portraits/men/45.jpg", bio: "Palestrante internacional, mestre em Marketing e ex-consultor do Sebrae com mais de 10 anos de experiência." },
+                { name: "Edgar Sérgio Nogueira", role: "Planejamento", img: "https://randomuser.me/api/portraits/men/11.jpg", bio: "Mais de 30 anos como especialista em pesquisa de marketing e analista de mercado." },
+                { name: "Adriane Martins", role: "Psicologia", img: "https://randomuser.me/api/portraits/women/28.jpg", bio: "Especialista em TCC e Saúde da Mulher, atuando no desenvolvimento humano estratégico." },
+                { name: "Rodrigo Ribeiro", role: "Contabilidade", img: "https://randomuser.me/api/portraits/men/55.jpg", bio: "Especializado em MEI, auxiliando desde a abertura até a gestão financeira." },
+                { name: "Rodrigo Campos", role: "Eventos", img: "https://randomuser.me/api/portraits/men/76.jpg", bio: "Mestre de cerimônias e palestrante com foco em gestão e liderança." },
+                { name: "Equipe Jurídica", role: "Suporte Legal", img: "https://randomuser.me/api/portraits/women/33.jpg", bio: "Dra. Luana Campos, Dra. Kelly Gomes e Dra. Luana Silva garantindo suporte legal completo." },
+            ];
+
+            return (
+                <section id="mentores" className="pt-20 pb-0 bg-white relative overflow-hidden border-t border-taupe/10 scroll-mt-20">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+                         <div className="text-center mb-12">
+                            <h2 className="text-sage font-bold tracking-wide uppercase text-sm mb-2">Nosso Time</h2>
+                            <h3 className="text-3xl md:text-4xl font-bold text-taupe mb-4">Mentores que vivem o que ensinam</h3>
+                            <p className="text-lg text-taupe/80 max-w-2xl mx-auto">
+                                Reunimos um time de peso para guiar sua jornada. A qualificação do nosso time é a base da sua segurança.
+                            </p>
+                        </div>
+
+                        {/* Descriptions Grid - Separated from Photos */}
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {mentors.map((mentor, idx) => (
+                                <motion.div 
+                                    key={idx}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: idx * 0.05 }}
+                                    viewport={{ once: true }}
+                                    className="bg-sand/40 p-6 rounded-2xl border-l-4 border-sage shadow-sm hover:shadow-md transition-all hover:bg-white hover:border-rose"
+                                >
+                                    <div className="flex items-center justify-between mb-3">
+                                        <h4 className="font-bold text-taupe text-lg">{mentor.name}</h4>
+                                        <span className="text-xs font-bold text-sage bg-sage/10 px-2 py-1 rounded uppercase tracking-wider">
+                                            {mentor.role}
+                                        </span>
+                                    </div>
+                                    <p className="text-taupe/80 text-sm leading-relaxed">
+                                        {mentor.bio}
+                                    </p>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Auto-scrolling Photos Marquee - Full Width */}
+                    <div className="w-full bg-taupe py-8 overflow-hidden relative">
+                        {/* Gradient Masks */}
+                        <div className="absolute top-0 left-0 h-full w-24 md:w-48 bg-gradient-to-r from-taupe to-transparent z-10"></div>
+                        <div className="absolute top-0 right-0 h-full w-24 md:w-48 bg-gradient-to-l from-taupe to-transparent z-10"></div>
+
+                        <motion.div 
+                            className="flex gap-8 w-max"
+                            animate={{ x: ["0%", "-50%"] }}
+                            transition={{ 
+                                repeat: Infinity, 
+                                ease: "linear", 
+                                duration: 40 
+                            }}
+                        >
+                            {/* Duplicated list for seamless infinite loop */}
+                            {[...mentors, ...mentors].map((mentor, idx) => (
+                                <div key={idx} className="relative w-64 h-80 rounded-2xl overflow-hidden flex-shrink-0 border-4 border-rose/20 group hover:border-rose transition-all duration-500">
+                                    <img 
+                                        src={mentor.img} 
+                                        alt={mentor.name} 
+                                        className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 grayscale hover:grayscale-0"
+                                        onError={(e) => e.currentTarget.src = "https://randomuser.me/api/portraits/women/44.jpg"} 
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-taupe/90 via-transparent to-transparent opacity-80"></div>
+                                    <div className="absolute bottom-0 left-0 w-full p-4">
+                                        <p className="text-white font-bold text-lg leading-tight">{mentor.name}</p>
+                                        <p className="text-rose text-xs font-bold uppercase mt-1">{mentor.role}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </motion.div>
+                    </div>
+                </section>
+            );
+        };
+
+        const WhyChoose = () => {
+            const pillars = [
+                { title: "De Empreendedora para Empreendedora", desc: "Feito por quem veio do zero, pensado para a realidade da mulher brasileira.", icon: "bg-rose/10 text-rose" },
+                { title: "Metodologia Testada", desc: "Sistema passo a passo validado por experts e aplicado em centenas de negócios.", icon: "bg-sage/10 text-sage" },
+                { title: "Formato Híbrido", desc: "Aulas online para ver de onde estiver, com a energia dos encontros presenciais.", icon: "bg-taupe/10 text-taupe" },
+                { title: "Mentoria Especializada", desc: "Acompanhamento próximo para garantir que você não trave no caminho.", icon: "bg-sand text-taupe" },
+            ];
+
+            return (
+                <section className="py-20 bg-white relative overflow-hidden">
+                     <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-rose/20 to-transparent"></div>
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="text-center mb-16">
+                            <h2 className="text-3xl font-bold text-taupe">Por que escolher a Sementes D'Maria?</h2>
+                        </div>
+                        
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+                            {pillars.map((pillar, idx) => (
+                                <motion.div 
+                                    key={idx}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: idx * 0.1 }}
+                                    viewport={{ once: true }}
+                                    className="text-center p-6 rounded-2xl hover:bg-sand/40 transition-colors"
+                                >
+                                    <div className={`w-16 h-16 ${pillar.icon} rounded-2xl mx-auto flex items-center justify-center mb-6 text-2xl font-bold shadow-sm`}>
+                                        {idx + 1}
+                                    </div>
+                                    <h3 className="text-lg font-bold text-taupe mb-3">{pillar.title}</h3>
+                                    <p className="text-taupe/70 text-sm leading-relaxed">{pillar.desc}</p>
+                                </motion.div>
+                            ))}
+                        </div>
+
+                        {/* Added Inspirational Text */}
+                        <motion.div 
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.4 }}
+                            className="max-w-4xl mx-auto text-center bg-rose/10 rounded-3xl p-8 md:p-12 border border-rose/20"
+                        >
+                            <div className="inline-flex items-center justify-center p-2 mb-6 bg-white rounded-full shadow-sm text-rose">
+                                <Icons.Sparkles />
+                            </div>
+                            <p className="text-lg md:text-xl text-taupe font-medium leading-relaxed italic mb-6">
+                                "Ao fazer parte da Sementes de Maria, você não apenas cresce. Você contribui para criar famílias mais estáveis, comunidades mais fortes e um cenário cultural mais justo. <span className="text-sage font-bold not-italic">É sobre regar a semente do potencial que existe dentro de cada mulher.</span>"
+                            </p>
+                            <div className="flex flex-col items-center justify-center">
+                                <img 
+                                    src="Josy%20Lopes.jpg" 
+                                    alt="Josy Lopes" 
+                                    className="w-20 h-20 rounded-full object-cover mb-4 border-4 border-white shadow-md"
+                                    onError={(e) => e.currentTarget.src = "https://randomuser.me/api/portraits/women/44.jpg"}
+                                />
+                                <span className="font-bold text-taupe text-lg">Josy Lopes</span>
+                                <span className="text-sm text-taupe/60">Fundadora da Sementes D'Maria</span>
+                            </div>
+                        </motion.div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Offer = () => {
+            return (
+                <section id="matricula" className="py-20 bg-ice border-t border-taupe/10">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        {/* Header */}
+                        <div className="text-center mb-12">
+                            <h2 className="text-sage font-bold tracking-wide uppercase text-sm mb-2">Investimento e Matrícula</h2>
+                            <h3 className="text-3xl md:text-4xl font-bold text-taupe mb-4">Condições exclusivas para 2026</h3>
+                            <p className="text-lg text-taupe/80">Escolha o plano ideal para o seu fluxo de caixa.</p>
+                        </div>
+
+                        {/* Registration Fee Banner */}
+                        <div className="max-w-md mx-auto bg-white/50 rounded-full py-2 px-6 mb-12 flex items-center justify-center border border-sage/20 shadow-sm">
+                            <span className="text-taupe font-medium mr-2">Taxa de Matrícula:</span>
+                            <span className="text-sage font-bold text-lg">R$ 97,00 (Taxa única)</span>
+                        </div>
+
+                        {/* Cards Grid */}
+                        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto items-start"> {/* Adicionei items-start para garantir alinhamento no topo se necessário, mas o padrão stretch também funciona */}
+                            {/* Monthly Plan */}
+                            <div className="bg-white rounded-3xl p-8 border border-rose/20 shadow-lg flex flex-col relative h-full">
+                                <h4 className="text-xl font-bold text-taupe mb-2">Plano Mensal</h4>
+                                <div className="text-4xl font-bold text-taupe mb-1">R$ 397,00 <span className="text-base font-normal text-taupe/60">/mês</span></div>
+                                <p className="text-taupe/70 text-sm mb-6">Flexibilidade para o seu negócio.</p>
+                                <ul className="space-y-3 mb-8 flex-1">
+                                    <li className="flex items-center text-taupe/80"><Icons.Check className="w-5 h-5 text-sage mr-2"/> Acesso completo</li>
+                                    <li className="flex items-center text-taupe/80"><Icons.Check className="w-5 h-5 text-sage mr-2"/> Flexibilidade mensal</li>
+                                </ul>
+                                <button className="w-full bg-transparent border-2 border-sage text-sage font-bold py-3 rounded-xl hover:bg-sage/10 transition-colors">
+                                    Escolher Mensal
+                                </button>
+                            </div>
+
+                            {/* Annual Plan (Highlighted) */}
+                            {/* Removi 'transform md:-translate-y-4' para alinhar os cards */}
+                            <div className="bg-sage rounded-3xl p-8 border border-sage shadow-xl flex flex-col relative h-full">
+                                 <div className="absolute top-0 right-0 bg-rose text-white text-xs font-bold px-3 py-1 rounded-bl-xl rounded-tr-2xl uppercase">
+                                    Mais Vantajoso
+                                </div>
+                                <h4 className="text-xl font-bold text-white mb-2">Plano Anual</h4>
+                                <div className="text-4xl font-bold text-white mb-1">R$ 297,00 <span className="text-base font-normal text-sand">/mês</span></div>
+                                <p className="text-sand text-sm mb-6">Economia de R$ 1.200,00 no ano.</p>
+                                <ul className="space-y-3 mb-8 flex-1">
+                                    <li className="flex items-center text-white"><div className="bg-white/20 p-1 rounded-full mr-3"><Icons.Check className="w-4 h-4 text-white"/></div> Acesso completo</li>
+                                    <li className="flex items-center text-white"><div className="bg-white/20 p-1 rounded-full mr-3"><Icons.Check className="w-4 h-4 text-white"/></div> Economia garantida</li>
+                                </ul>
+                                <button className="w-full bg-white text-sage font-bold py-3 rounded-xl hover:bg-sand transition-colors shadow-lg">
+                                    Quero Economizar R$ 1.200
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const FAQ = () => {
+            const faqs = [
+                { q: "Quando começa o curso?", a: "O ciclo inicia em Janeiro de 2026. Estamos abrindo as vagas agora para formação das turmas e planejamento estratégico de cada aluno." },
+                { q: "As aulas são presenciais?", a: "As aulas principais são transmitidas online (ao vivo e gravadas), permitindo que você assista de qualquer lugar de Minas Gerais. Teremos também eventos exclusivos como a Feira Presencial e encontros de networking." },
+                { q: "Serve para quem ainda não tem empresa aberta?", a: "Sim! Temos especialistas em contabilidade e abertura de empresas (MEI) dedicados para te ajudar a começar do zero de forma correta e segura." },
+            ];
+
+            const [openIndex, setOpenIndex] = useState(0);
+
+            return (
+                <section id="faq" className="py-20 bg-white">
+                    <div className="max-w-3xl mx-auto px-4">
+                        <div className="text-center mb-12">
+                            <h2 className="text-3xl font-bold text-taupe">Perguntas Frequentes</h2>
+                        </div>
+
+                        <div className="space-y-4">
+                            {faqs.map((faq, idx) => (
+                                <div key={idx} className="border border-taupe/20 rounded-2xl overflow-hidden">
+                                    <button 
+                                        onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
+                                        className="w-full flex justify-between items-center p-6 text-left hover:bg-sand/30 transition-colors"
+                                    >
+                                        <span className="font-bold text-taupe text-lg">{faq.q}</span>
+                                        <motion.div 
+                                            animate={{ rotate: openIndex === idx ? 180 : 0 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <Icons.ChevronDown />
+                                        </motion.div>
+                                    </button>
+                                    <AnimatePresence>
+                                        {openIndex === idx && (
+                                            <motion.div 
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: "auto", opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                className="overflow-hidden"
+                                            >
+                                                <div className="p-6 pt-0 text-taupe/80 leading-relaxed">
+                                                    {faq.a}
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const AISection = () => {
+            const [mode, setMode] = useState("mentoria"); // 'mentoria' or 'social'
+            const [input1, setInput1] = useState("");
+            const [input2, setInput2] = useState("");
+            const [loading, setLoading] = useState(false);
+            const [response, setResponse] = useState(null);
+            const [error, setError] = useState(null);
+
+            const handleGenerate = async () => {
+                if (!input1) return;
+                
+                setLoading(true);
+                setError(null);
+                setResponse(null);
+
+                try {
+                    let prompt = "";
+                    if (mode === "mentoria") {
+                        prompt = `Você é uma mentora de negócios experiente e motivadora do curso Sementes D'Maria. 
+                        A usuária tem um negócio de: "${input1}". 
+                        O maior desafio dela hoje é: "${input2}". 
+                        Forneça 3 dicas práticas, acionáveis e encorajadoras.
+                        Use formatação markdown simples. Seja concisa e acolhedora.`;
+                    } else {
+                        prompt = `Atue como uma especialista em Social Media do Sementes D'Maria.
+                        Crie uma legenda engajadora para o Instagram sobre o tema: "${input1}".
+                        O tom de voz deve ser: "${input2 || 'Profissional e motivador'}".
+                        Inclua emojis relevantes e 5 hashtags estratégicas.
+                        Use formatação markdown.`;
+                    }
+
+                    const result = await fetch(
+                        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                contents: [{
+                                    parts: [{ text: prompt }]
+                                }]
+                            })
+                        }
+                    );
+
+                    if (!result.ok) throw new Error('Erro na conexão com a IA');
+                    
+                    const data = await result.json();
+                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Desculpe, tente novamente.";
+                    setResponse(text);
+                } catch (err) {
+                    setError("Ocorreu um erro. Tente novamente.");
+                    console.error(err);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            // Advanced Text Renderer
+            const renderText = (text) => {
+                if (!text) return null;
+                return text.split('\n').map((line, i) => {
+                    const isBullet = line.trim().startsWith('*') || line.trim().startsWith('-');
+                    const cleanLine = isBullet ? line.trim().substring(1).trim() : line;
+                    const parts = cleanLine.split(/(\*\*.*?\*\*)/g);
+                    const children = parts.map((part, j) => {
+                        if (part.startsWith('**') && part.endsWith('**')) {
+                            return <strong key={j} className="text-sage font-bold">{part.slice(2, -2)}</strong>;
+                        }
+                        return part;
+                    });
+
+                    if (isBullet) {
+                        return (
+                            <div key={i} className="flex items-start gap-3 mb-3 pl-2">
+                                <div className="mt-1.5 min-w-[8px] h-[8px] rounded-full bg-rose shrink-0"></div>
+                                <div className="text-taupe/80 leading-relaxed">{children}</div>
+                            </div>
+                        );
+                    }
+                    if (cleanLine.startsWith('##')) return <h4 key={i} className="text-lg font-bold text-taupe mt-6 mb-3">{cleanLine.replace(/^#+\s/, '')}</h4>;
+                    if (!cleanLine.trim()) return <div key={i} className="h-2"></div>;
+                    return <p key={i} className="mb-3 text-taupe/80 leading-relaxed">{children}</p>;
+                });
+            };
+
+            return (
+                <section id="mentoria-ia" className="py-20 bg-gradient-to-b from-white to-sand/50 scroll-mt-20">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="grid lg:grid-cols-2 gap-16 items-start">
+                            
+                            <div className="space-y-6">
+                                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose/10 text-rose text-sm font-bold uppercase tracking-wide">
+                                    <Icons.Sparkles /> Inteligência D'Maria
+                                </div>
+                                <h2 className="text-3xl md:text-4xl font-bold text-taupe leading-tight">
+                                    Ferramentas de <span className="text-gradient">IA para seu Negócio</span>
+                                </h2>
+                                <p className="text-lg text-taupe/80 leading-relaxed">
+                                    A tecnologia a seu favor. Escolha uma ferramenta abaixo e veja a mágica acontecer gratuitamente.
+                                </p>
+                                
+                                <div className="bg-white rounded-2xl p-8 shadow-xl border border-rose/20">
+                                    {/* Tabs */}
+                                    <div className="flex p-1 bg-ice rounded-xl mb-6">
+                                        <button 
+                                            onClick={() => { setMode("mentoria"); setResponse(null); setInput1(""); setInput2(""); }}
+                                            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${mode === "mentoria" ? "bg-white text-sage shadow-sm" : "text-taupe/60 hover:text-taupe"}`}
+                                        >
+                                            Mentoria
+                                        </button>
+                                        <button 
+                                            onClick={() => { setMode("social"); setResponse(null); setInput1(""); setInput2(""); }}
+                                            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${mode === "social" ? "bg-white text-sage shadow-sm" : "text-taupe/60 hover:text-taupe"}`}
+                                        >
+                                            Criador de Posts
+                                        </button>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        {mode === "mentoria" ? (
+                                            <>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-taupe mb-1">Qual é o seu negócio?</label>
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="Ex: Confeitaria artesanal..." 
+                                                        className="w-full px-4 py-3 rounded-lg border border-taupe/20 focus:border-sage focus:ring-2 focus:ring-sage/30 outline-none transition-all bg-ice"
+                                                        value={input1}
+                                                        onChange={(e) => setInput1(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-taupe mb-1">Qual seu maior desafio hoje?</label>
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="Ex: Precificar meus produtos..." 
+                                                        className="w-full px-4 py-3 rounded-lg border border-taupe/20 focus:border-sage focus:ring-2 focus:ring-sage/30 outline-none transition-all bg-ice"
+                                                        value={input2}
+                                                        onChange={(e) => setInput2(e.target.value)}
+                                                    />
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-taupe mb-1">Sobre o que é o post?</label>
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="Ex: Promoção de Dia das Mães, Novo Produto..." 
+                                                        className="w-full px-4 py-3 rounded-lg border border-taupe/20 focus:border-sage focus:ring-2 focus:ring-sage/30 outline-none transition-all bg-ice"
+                                                        value={input1}
+                                                        onChange={(e) => setInput1(e.target.value)}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-taupe mb-1">Qual o tom de voz? (Opcional)</label>
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="Ex: Divertido, Sério, Emocionante..." 
+                                                        className="w-full px-4 py-3 rounded-lg border border-taupe/20 focus:border-sage focus:ring-2 focus:ring-sage/30 outline-none transition-all bg-ice"
+                                                        value={input2}
+                                                        onChange={(e) => setInput2(e.target.value)}
+                                                    />
+                                                </div>
+                                            </>
+                                        )}
+
+                                        <button 
+                                            onClick={handleGenerate}
+                                            disabled={loading || !input1}
+                                            className="w-full bg-sage hover:bg-sage/90 disabled:bg-taupe/30 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl shadow-lg transition-all flex justify-center items-center"
+                                        >
+                                            {loading ? (
+                                                <>Gerando... <Icons.Loader /></>
+                                            ) : (
+                                                <>{mode === "mentoria" ? "Receber Conselhos ✨" : "Criar Legenda ✨"}</>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Result Area */}
+                            <div className="relative">
+                                <div className="bg-white rounded-3xl shadow-2xl border border-rose/20 overflow-hidden min-h-[500px] flex flex-col">
+                                    <div className="bg-taupe p-6 flex items-center gap-4">
+                                        <div className="bg-white/20 p-2 rounded-lg">
+                                            <Icons.Bot />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-white font-bold text-lg">
+                                                {mode === "mentoria" ? "Mentora Virtual" : "Assistente de Conteúdo"}
+                                            </h3>
+                                            <p className="text-sand text-sm">Sementes D'Maria AI</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="p-8 flex-1 bg-ice overflow-y-auto">
+                                        {!response && !loading && (
+                                            <div className="h-full flex flex-col items-center justify-center text-center text-taupe/50 opacity-60">
+                                                <Icons.Lightbulb />
+                                                <p className="mt-4 max-w-xs">Preencha os dados ao lado para usar a inteligência artificial.</p>
+                                            </div>
+                                        )}
+                                        
+                                        {loading && (
+                                            <div className="space-y-6 p-4">
+                                                <div className="flex gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-rose flex-shrink-0"></div>
+                                                    <div className="flex-1 space-y-2">
+                                                        <div className="h-4 bg-taupe/10 rounded w-3/4 animate-pulse"></div>
+                                                        <div className="h-4 bg-taupe/10 rounded w-full animate-pulse"></div>
+                                                    </div>
+                                                </div>
+                                                <div className="flex gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-rose flex-shrink-0"></div>
+                                                    <div className="flex-1 space-y-2">
+                                                        <div className="h-4 bg-taupe/10 rounded w-5/6 animate-pulse"></div>
+                                                        <div className="h-4 bg-taupe/10 rounded w-full animate-pulse"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {response && (
+                                            <motion.div 
+                                                initial={{ opacity: 0, y: 10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                className="ai-response"
+                                            >
+                                                {renderText(response)}
+                                                
+                                                <div className="mt-8 pt-6 border-t border-taupe/10 bg-sage/10 -mx-8 -mb-8 p-8">
+                                                    <p className="text-sm text-taupe/80 italic mb-4 flex gap-2">
+                                                        <Icons.Sparkles />
+                                                        Gostou do resultado? No curso completo ensinamos como usar IA para escalar suas vendas!
+                                                    </p>
+                                                    <a href="#matricula" className="inline-block bg-white border border-sage/30 text-sage px-4 py-2 rounded-lg font-bold text-sm hover:bg-sage/10 transition-colors">
+                                                        Quero dominar IA nos Negócios &rarr;
+                                                    </a>
+                                                </div>
+                                            </motion.div>
+                                        )}
+
+                                        {error && (
+                                            <div className="text-rose bg-rose/10 p-4 rounded-lg text-center border border-rose/20">
+                                                <p className="font-bold text-sm">{error}</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                                {/* Decorative Blob */}
+                                <div className="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-rose/20 to-sage/20 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const FinalCTA = () => {
+            return (
+                <section className="py-20">
+                    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="bg-sage rounded-[2.5rem] overflow-hidden shadow-2xl relative text-center">
+                            {/* Background Elements */}
+                            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-taupe/30 to-transparent"></div>
+                            
+                            <div className="relative z-10 p-12 md:p-20 flex flex-col items-center">
+                                <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight max-w-2xl">
+                                    Comece sua jornada de sucesso hoje.
+                                </h2>
+                                <p className="text-sand text-lg mb-10 max-w-xl">
+                                    Junte-se a centenas de mulheres que estão transformando a economia de Minas Gerais.
+                                </p>
+                                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                    <button className="bg-white text-sage px-10 py-4 rounded-full font-bold text-lg hover:bg-sand transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
+                                        Quero me Inscrever Agora
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Footer = () => {
+            return (
+                <footer className="bg-sage border-t border-taupe/10 py-12 text-white">
+                    <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+                        <div className="flex items-center gap-2">
+                            <span className="font-bold text-white text-xl">Sementes D'Maria</span>
+                            <span className="text-sand/70 text-sm">© 2025</span>
+                        </div>
+                        
+                        <div className="flex gap-6">
+                            <a href="#" className="text-white/80 hover:text-white transition-colors"><Icons.Instagram /></a>
+                            <a href="#" className="text-white/80 hover:text-white transition-colors"><Icons.Youtube /></a>
+                            <a href="#" className="text-white/80 hover:text-white transition-colors"><Icons.Linkedin /></a>
+                        </div>
+                    </div>
+                </footer>
+            );
+        };
+
+        const App = () => {
+            useEffect(() => {
+                lucide.createIcons();
+            }, []);
+
+            return (
+                <div className="antialiased selection:bg-rose selection:text-white">
+                    <Navbar />
+                    <main>
+                        <Hero />
+                        <Logos />
+                        <CourseStory />
+                        <Features />
+                        <Mentors />
+                        <WhyChoose />
+                        <Offer /> 
+                        <FAQ />
+                        <AISection /> 
+                        <FinalCTA />
+                    </main>
+                    <Footer />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
